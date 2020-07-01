@@ -1,6 +1,6 @@
 ---
 title: "A Mini Bookdown"
-author: "Frida Gomam"
+author: "Your Name"
 site: bookdown::bookdown_site
 documentclass: book
 output:
