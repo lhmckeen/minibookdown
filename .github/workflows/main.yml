@@ -7,31 +7,47 @@ on:
 
 name: Bookdown
 
-# Controls when the action will run. Triggers the workflow on push
-# events but only for the main branch
+# Courtesy of _Github actions with R_, available: https://ropenscilabs.github.io/actions_sandbox/
+
+name: renderbook
 
 jobs:
-  build:
-    name: Build and Deploy to GitHub Pages
-    runs-on: ubuntu-latest
-    container:
-      image: rstudio/r-base:3.6-bionic
+  bookdown:
+    name: Render-Book
+    runs-on: macOS-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+      - uses: r-lib/actions/setup-r@v1
+      - uses: r-lib/actions/setup-pandoc@v1
+      - name: Install rmarkdown
+        run: Rscript -e 'install.packages(c("rmarkdown","bookdown"))'
+      - name: Render Book
+        run: Rscript -e 'bookdown::render_book("index.Rmd")'
+      - uses: actions/upload-artifact@v1
         with:
-          fetch-depth: 1
-      - name: Install System Dependencies
-        run: sudo apt-get update && apt-get install -y --no-install-recommends
-      - name: Install Bookdown
-        run: |-
-          Rscript -e "install.packages('bookdown', repos = 'https://demo.rstudiopm.com/all/__linux__/bionic/latest')"
-      - name: Build book
-        run: |-
-          Rscript -e "bookdown::render_book('index.Rmd', 'bookdown::gitbook')"
-      - name: Deploy to GitHub Pages
-        uses: Cecilapp/GitHub-Pages-deploy@master
-        env:
-          EMAIL: chris-diaz@northwestern.edu # must be a verified email
-          GH_TOKEN: ${{ secrets.GH_PAT }} # https://github.com/settings/tokens
+          name: _book
+          path: _book/
+  
+# Need to first create an empty gh-pages branch
+# see https://pkgdown.r-lib.org/reference/deploy_site_github.html
+# and also add secrets for a GITHUB_PAT and EMAIL to the repository
+# gh-action from Cecilapp/GitHub-Pages-deploy
+  checkout-and-deploy:
+   runs-on: ubuntu-latest
+   needs: bookdown
+   steps:
+     - name: Checkout
+       uses: actions/checkout@v2
+     - name: Download artifact
+       uses: actions/download-artifact@v1.0.0
+       with:
+         # Artifact name
+         name: _book # optional
+         # Destination path
+         path: _book # optional
+     - name: Deploy to GitHub Pages
+       uses: Cecilapp/GitHub-Pages-deploy@master
+       env:
+          EMAIL: ${{ secrets.EMAIL }}               # must be a verified email
+          GH_TOKEN: ${{ secrets.GITHUB_PAT }} # https://github.com/settings/tokens
           BUILD_DIR: _book/                     # "_site/" by default
