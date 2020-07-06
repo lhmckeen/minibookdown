@@ -1,6 +1,6 @@
 ---
 title: "Lauren's First Textbook"
-author: "Lauren McKeen"
+author: Lauren McKeen
 site: bookdown::bookdown_site
 documentclass: book
 output:
