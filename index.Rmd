@@ -1,6 +1,6 @@
 ---
-title: "A Mini Bookdown"
-author: "Your Name"
+title: "Lauren's First Textbook"
+author: "Lauren McKeen"
 site: bookdown::bookdown_site
 documentclass: book
 output:
