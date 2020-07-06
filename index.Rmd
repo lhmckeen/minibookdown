@@ -10,4 +10,4 @@ output:
 
 # Create your open textbook
 
-Hello!!
+Hello!
